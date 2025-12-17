@@ -21,9 +21,4 @@ public class EmployeeDTO implements Serializable {
     private String sex;
 
     private String idNumber;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
-
-    private Long updateUser;
 }

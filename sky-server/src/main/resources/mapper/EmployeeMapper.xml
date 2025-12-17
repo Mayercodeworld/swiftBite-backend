@@ -8,7 +8,7 @@
         select * from employee 
         <where>
             <if test="name != null and name != ''">
-                username like concat('%', #{name}, '%')
+                name like concat('%', #{name}, '%')
             </if>
         </where>
         order by create_time
@@ -32,7 +32,12 @@
             <if test="idNumber != null and idNumber != ''">
                 id_number = #{idNumber},
             </if>
-            update_time = #{updateTime}
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
         </set>
         WHERE id = #{id}
     </update>

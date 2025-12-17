@@ -1,7 +1,6 @@
 package com.sky.mapper;
 
-import com.sky.dto.EmployeeDTO;
-import com.sky.dto.EmployeeEditPasswordDto;
+import com.sky.dto.EmployeeEditPasswordDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import org.apache.ibatis.annotations.Insert;
@@ -9,7 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -42,7 +40,7 @@ public interface EmployeeMapper {
      * 修改密码
      */
     @Update("update employee set password = #{newPassword} where id = #{empId}")
-    void editPassword(EmployeeEditPasswordDto employeeEditPasswordDto);
+    void editPassword(EmployeeEditPasswordDTO employeeEditPasswordDto);
 
     /**
      * 分页查询员工
@@ -50,13 +48,13 @@ public interface EmployeeMapper {
     List<Employee> searchByPage(EmployeePageQueryDTO employeePageQueryDTO);
 
     /**
-     * 编辑员工
+     * 编辑员工 or 启用或禁用员工（都是同一操作只不过修改的内容不同）
      */
-    void editEmp(EmployeeDTO employeeDTO);
+    void editEmp(Employee employee);
 
-    /**
-     * 启用、禁用员工账号
-     */
-    @Update("update employee set status = #{status}, update_time = #{updateTime} where id = #{id} and status != #{status}")
-    void editStatus(Integer status, Integer id, LocalDateTime updateTime);
+//    /**
+//     * 启用、禁用员工账号
+//     */
+//    @Update("update employee set status = #{status}, update_time = #{updateTime} where id = #{id} and status != #{status}")
+//    void editStatus(Integer status, Long id, LocalDateTime updateTime);
 }

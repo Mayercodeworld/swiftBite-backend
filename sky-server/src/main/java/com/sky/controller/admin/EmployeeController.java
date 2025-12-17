@@ -2,7 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
-import com.sky.dto.EmployeeEditPasswordDto;
+import com.sky.dto.EmployeeEditPasswordDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,6 +108,7 @@ public class EmployeeController {
     public Result<Employee> findByEmpId(@PathVariable Integer id) {
         log.info("根据id查询员工信息{}", id);
         Employee employee = employeeService.findByEmpId(id);
+        employee.setPassword("******");
         return Result.success(employee);
     }
 
@@ -117,9 +117,9 @@ public class EmployeeController {
      */
     @PutMapping("/editPassword")
     @ApiOperation(value = "修改密码")
-    public Result<String> editPassword(@RequestBody EmployeeEditPasswordDto employeeEditPasswordDto) {
-        log.info("修改员工密码{}", employeeEditPasswordDto);
-        employeeService.editPassword(employeeEditPasswordDto);
+    public Result<String> editPassword(@RequestBody EmployeeEditPasswordDTO employeeEditPasswordDTO) {
+        log.info("修改员工密码{}", employeeEditPasswordDTO);
+        employeeService.editPassword(employeeEditPasswordDTO);
         return Result.success();
     }
 
@@ -139,7 +139,7 @@ public class EmployeeController {
      */
     @PostMapping("/status/{status}")
     @ApiOperation(value = "启用、禁用账号")
-    public Result<String> editStatus(@PathVariable Integer status, Integer id) {
+    public Result<String> editStatus(@PathVariable Integer status, Long id) {
         log.info("编辑员工状态:{},id:{}",status, id);
         employeeService.editStatus(status, id);
         return Result.success();

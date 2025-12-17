@@ -1,7 +1,7 @@
 package com.sky.service;
 
 import com.sky.dto.EmployeeDTO;
-import com.sky.dto.EmployeeEditPasswordDto;
+import com.sky.dto.EmployeeEditPasswordDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
@@ -26,7 +26,7 @@ public interface EmployeeService {
     /**
      * 修改密码
      */
-    void editPassword(EmployeeEditPasswordDto employeeEditPasswordDto);
+    void editPassword(EmployeeEditPasswordDTO employeeEditPasswordDTO);
 
     /**
      * 根据id查询员工
@@ -46,5 +46,5 @@ public interface EmployeeService {
     /**
      * 启用、禁用员工账号
      */
-    void editStatus(Integer status, Integer id);
+    void editStatus(Integer status, Long id);
 }

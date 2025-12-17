@@ -7,7 +7,7 @@ import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
-import com.sky.dto.EmployeeEditPasswordDto;
+import com.sky.dto.EmployeeEditPasswordDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
@@ -100,20 +100,20 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 修改密码
      */
     @Override
-    public void editPassword(EmployeeEditPasswordDto employeeEditPasswordDto) {
-        Employee employee = employeeMapper.findByEmpId(employeeEditPasswordDto.getEmpId());
+    public void editPassword(EmployeeEditPasswordDTO employeeEditPasswordDTO) {
+        Employee employee = employeeMapper.findByEmpId(employeeEditPasswordDTO.getEmpId());
         if(employee == null) {
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-        String oldPassword = DigestUtils.md5DigestAsHex(employeeEditPasswordDto.getOldPassword().getBytes());
+        String oldPassword = DigestUtils.md5DigestAsHex(employeeEditPasswordDTO.getOldPassword().getBytes());
 
         if(!oldPassword.equals(employee.getPassword())) {
             // 新旧密码不匹配
             throw new PasswordErrorException(MessageConstant.PASSWORD_NOT_MASTER_FAILES);
         }
         // 加密新密码
-        String newPassword = DigestUtils.md5DigestAsHex(employeeEditPasswordDto.getNewPassword().getBytes());
-        employeeMapper.editPassword(employeeEditPasswordDto);
+        String newPassword = DigestUtils.md5DigestAsHex(employeeEditPasswordDTO.getNewPassword().getBytes());
+        employeeMapper.editPassword(employeeEditPasswordDTO);
     }
 
     /**
@@ -145,17 +145,27 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     @Override
     public void editEmp(EmployeeDTO employeeDTO) {
-        employeeDTO.setUpdateTime(LocalDateTime.now());
-        employeeDTO.setUpdateUser(BaseContext.getCurrentId());
-        employeeMapper.editEmp(employeeDTO);
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        // 修改时间
+        employee.setUpdateTime(LocalDateTime.now());
+        // 设置最后修改此用户的id
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        employeeMapper.editEmp(employee);
     }
 
     /**
      * 启用、禁用员工账号
      */
     @Override
-    public void editStatus(Integer status, Integer id) {
-        LocalDateTime updateTime = LocalDateTime.now();
-        employeeMapper.editStatus(status, id, updateTime);
+    public void editStatus(Integer status, Long id) {
+        Employee employee = Employee.builder()
+                        .status(status)
+                        .id(id)
+                        .build();
+        
+        employeeMapper.editEmp(employee);
     }
 }
