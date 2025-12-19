@@ -82,16 +82,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         // 默认账号的状态，默认状态 1表示正常， 0 表示锁定
         employee.setStatus(StatusConstant.ENABLE);
 
-        // 设置时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
         // 设置密码
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes())); // 设置默认密码123456（加密）
 
-        // 设置创建人id和修改人id
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        // AOP切面自动实现
+        //// 设置时间
+        //employee.setCreateTime(LocalDateTime.now());
+        //employee.setUpdateTime(LocalDateTime.now());
+        //// 设置创建人id和修改人id
+        //employee.setCreateUser(BaseContext.getCurrentId());
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.addEmp(employee);
     }
@@ -148,10 +148,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);
 
-        // 修改时间
-        employee.setUpdateTime(LocalDateTime.now());
-        // 设置最后修改此用户的id
-        employee.setUpdateUser(BaseContext.getCurrentId());
+        //// 修改时间
+        //employee.setUpdateTime(LocalDateTime.now());
+        //// 设置最后修改此用户的id
+        //employee.setUpdateUser(BaseContext.getCurrentId());
 
         employeeMapper.editEmp(employee);
     }
