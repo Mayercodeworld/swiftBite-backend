@@ -3,10 +3,36 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.DishMapper">
     <insert id="add" useGeneratedKeys="true" keyProperty="id">
-        insert into dish (name, category_id, price, image, description, status)
+        insert into dish (name, category_id, price, image, description, status, create_time, update_time, create_user, update_user)
         values
-        (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status})
+        (#{name}, #{categoryId}, #{price}, #{image}, #{description}, #{status}, #{createTime}, #{updateTime}, #{createUser}, #{updateUser})
     </insert>
 
+    <!-- 分页查询 -->
+    <select id="page" resultType="com.sky.vo.DishVO">
+        select d.id id, d.name name, category_id, price, image, description, d.status status, d.update_time updateTime, c.name categoryName
+        from dish d, category c
+        <where>
+            d.category_id = c.id
+            <if test="categoryId != null">
+                and category_id = #{categoryId}
+            </if>
+            <if test="name != null and name != ''">
+                and d.name like concat("%", #{name}, "%")
+            </if>
+            <if test="status != null">
+                and d.status = #{status}
+            </if>
+        </where>
+        order by d.create_time desc
+    </select>
 
+    <!-- 批量删除菜品 -->
+    <delete id="delete">
+        delete from dish
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
