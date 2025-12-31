@@ -68,4 +68,20 @@ public interface DishMapper {
             ", image = #{image}, name = #{name}, price = #{price}, update_time = #{updateTime}, update_user = #{updateUser} " +
             "where id = #{id}")
     void update(Dish dish);
+
+    /**
+     * 客户端根据分类Id查询菜品
+     * @param dish
+     * @return
+     */
+    @Select("select * from dish where category_id = #{categoryId} and status = #{status}")
+    List<Dish> list(Dish dish);
+
+    /**
+     * 根据套餐id查询菜品
+     * @param setmealId
+     * @return
+     */
+    @Select("select a.* from dish a left join setmeal_dish b on a.id = b.dish_id where b.setmeal_id = #{setmealId}")
+    List<Dish> getBySetmealId(Long setmealId);
 }

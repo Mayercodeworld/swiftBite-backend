@@ -42,6 +42,5 @@ public interface CategoryMapper {
     /**
      * 根据类型查询分类
      */
-    @Select("select * from category where type = #{type} order by sort")
     List<Category> list(Integer type);
 }

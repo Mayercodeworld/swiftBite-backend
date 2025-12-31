@@ -42,10 +42,19 @@ sky:
     admin-ttl: 72000000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    # 设置用户端的jwt
+    user-secret-key: itheima
+    user-ttl: 72000000
+    user-token-name: authentication
 
-#文件上传相关参数配置
-minio:
-  endpoint: ${sky.minio.endpoint}
-  bucketName: ${sky.minio.bucketName}
-  accessKey: ${sky.minio.accessKey}
-  secretKey: ${sky.minio.secretKey}
+  #文件上传相关参数配置
+  minio:
+    endpoint: ${sky.minio.endpoint}
+    bucketName: ${sky.minio.bucketName}
+    accessKey: ${sky.minio.accessKey}
+    secretKey: ${sky.minio.secretKey}
+
+  # 微信登录相关配置
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
