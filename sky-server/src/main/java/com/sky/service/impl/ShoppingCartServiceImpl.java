@@ -69,6 +69,36 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCartMapper.insert(shoppingCart);
         }
     }
+    /**
+     * 删除购物车
+     * @param shoppingCartDTO
+     */
+    @Override
+    public void subShoppingCart(ShoppingCartDTO shoppingCartDTO) {
+        // 实现逻辑，user_id
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        Long userId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(userId);
+
+        // 1、查找到当前菜品or套餐（一定能查找到）
+        List<ShoppingCart> list = shoppingCartMapper.list(shoppingCart);
+        // 避免前端未刷新导致的错误
+        if (list == null) {
+            return ;
+        }
+        ShoppingCart cart = list.get(0);
+
+        if(cart.getNumber() > 1) {
+            // 2、 如果数量大于1更新数量即可
+            cart.setNumber(cart.getNumber() - 1); // 更新原来购物车的数量
+            shoppingCartMapper.updateNumberById(cart);
+        }
+        else {
+            // 3、如果数量等于1
+            shoppingCartMapper.deleteById(cart.getId());
+        }
+    }
 
     /**
      * 查看购物车
@@ -86,7 +116,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     /**
      * 清空购物车
-     * @param userId
+     * @param
      */
     @Override
     public void cleanShoppingCart() {

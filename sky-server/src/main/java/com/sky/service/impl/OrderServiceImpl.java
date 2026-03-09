@@ -2,8 +2,11 @@ package com.sky.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.entity.*;
@@ -11,10 +14,12 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,19 +172,132 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 用户端订单分页查询
+     *
+     * @param pageNum
+     * @param pageSize
+     * @param status
+     * @return
+     */
+    public PageResult pageQuery4User(int pageNum, int pageSize, Integer status) {
+        // 设置分页
+        PageHelper.startPage(pageNum, pageSize);
+
+        OrdersPageQueryDTO ordersPageQueryDTO = new OrdersPageQueryDTO();
+        ordersPageQueryDTO.setUserId(BaseContext.getCurrentId());
+        ordersPageQueryDTO.setStatus(status);
+
+        // 分页条件查询
+        Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
+
+        List<OrderVO> list = new ArrayList();
+
+        // 查询出订单明细，并封装入OrderVO进行响应
+        if (page != null && page.getTotal() > 0) {
+            for (Orders orders : page) {
+                Long orderId = orders.getId();// 订单id
+
+                // 查询订单明细
+                List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(orderId);
+
+                OrderVO orderVO = new OrderVO();
+                BeanUtils.copyProperties(orders, orderVO);
+                orderVO.setOrderDetailList(orderDetails);
+
+                list.add(orderVO);
+            }
+        }
+        return new PageResult(page.getTotal(), list);
+    }
+
+    /**
+     * 查询订单详情
+     *
+     * @param id
+     * @return
+     */
+    public OrderVO details(Long id) {
+        // 根据id查询订单
+        Orders orders = orderMapper.getById(id);
+
+        // 查询该订单对应的菜品/套餐明细
+        List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orders.getId());
+
+        // 将该订单及其详情封装到OrderVO并返回
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders, orderVO);
+        orderVO.setOrderDetailList(orderDetailList);
+
+        return orderVO;
+    }
+
+    /**
+     * 再来一单
+     * @param id
+     */
+    @Override
+    public void repetition(Long id) {
+        // 1、根据orderId查询order_detail中对应的菜品
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+        // 2、将对应菜品的信息写入shopping_cart中（实现选中刚才的菜品）
+        Long userId = BaseContext.getCurrentId();
+        for (OrderDetail orderDetail : orderDetails) {
+            ShoppingCart shoppingCart =  ShoppingCart.builder()
+                    .userId(userId)
+                    .name(orderDetail.getName())
+                    .image(orderDetail.getImage())
+                    .dishId(orderDetail.getDishId())
+                    .setmealId(orderDetail.getSetmealId())
+                    .dishFlavor(orderDetail.getDishFlavor())
+                    .number(orderDetail.getNumber())
+                    .amount(orderDetail.getAmount())
+                    .createTime(LocalDateTime.now())
+                    .build();
+            shoppingCartMapper.insert(shoppingCart);
+        }
+    }
+
+    /**
+     * 取消订单
+     * @param id
+     */
+    @Override
+    public void cancel(Long id) {
+        // 1、查询是否存在该订单
+        Orders orders = orderMapper.getById(id);
+        // 2、修改该订单orders中的status
+        if(orders != null) {
+            Orders order = Orders.builder()
+                    .id(orders.getId())
+                    .status(Orders.CANCELLED)
+                    .cancelReason("用户自己取消")
+                    .cancelTime(LocalDateTime.now())
+                    .build();
+            orderMapper.update(order);
+        }
+    }
+
+    /**
      * 客户催单
      * @param id
      */
     @Override
     public void reminder(Long id) {
-        // 通过webSocket向客户端浏览器推送消息 type orderId content
-        Map<String, Object> map = new HashMap();
-        map.put("type", 1); // 1表示来单提醒 2表示客户催单
-//        map.put("orderId", ordersDB.getId());
-//        map.put("content", "订单号：" + outTradeNo);
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
 
-        String json = JSON.toJSONString(map);
-        webSocketServer.sendToAllClient(json); // 群发所有长连接服务端
+        // 校验订单是否存在
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Map map = new HashMap();
+        map.put("type",2); //1表示来单提醒 2表示客户催单
+        map.put("orderId",id);
+        map.put("content","订单号：" + ordersDB.getNumber());
+
+        //通过websocket向客户端浏览器推送消息
+        webSocketServer.sendToAllClient(JSON.toJSONString(map)); // 群发所有长连接服务端
     }
 
 
