@@ -1,5 +1,6 @@
 package com.sky.controller.user;
 
+import com.alibaba.fastjson.JSON;
 import com.sky.dto.OrdersPaymentDTO;
 import com.sky.dto.OrdersSubmitDTO;
 import com.sky.result.Result;
@@ -11,6 +12,9 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController("userOrderController")
@@ -46,9 +50,23 @@ public class OrderController {
         OrderPaymentVO orderPaymentVO = orderService.payment(ordersPaymentDTO);
         log.info("生成预支付交易单：{}", orderPaymentVO);
 
-        // 跳过微信支付
+        // 跳过微信支付，直接支付成功
         orderService.paySuccess(ordersPaymentDTO.getOrderNumber());
 
         return Result.success(orderPaymentVO);
     }
+
+    /**
+     * 客户催单
+     * @param id
+     * @return
+     */
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("客户催单")
+    public Result reminder(@PathVariable Long id) {
+        log.info("订单：{} 催单", id);
+        orderService.reminder(id);
+        return Result.success();
+    }
+
 }

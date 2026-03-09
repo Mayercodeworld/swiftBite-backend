@@ -42,4 +42,35 @@
         where id = #{id}
     </update>
 
+    <!-- 批量删除超时订单-->
+    <delete id="batchDelete">
+        delete from orders
+        where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 更新订单超时原因-->
+    <update id="updateStatus">
+        update orders
+        <set>
+            <!-- 必须通过 order. 访问属性 -->
+            <if test="order.status != null">
+                status = #{order.status},
+            </if>
+            <if test="order.cancelReason != null">
+                cancel_reason = #{order.cancelReason},
+            </if>
+            <if test="order.cancelTime != null">
+                cancel_time = #{order.cancelTime},
+            </if>
+        </set>
+        where id in
+        <!-- collection 必须对应 @Param("ids") -->
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
 </mapper>

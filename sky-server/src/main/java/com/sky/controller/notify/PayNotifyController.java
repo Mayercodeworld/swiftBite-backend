@@ -45,8 +45,8 @@ public class PayNotifyController {
         log.info("解密后的文本：{}", plainText);
 
         JSONObject jsonObject = JSON.parseObject(plainText);
-        String outTradeNo = jsonObject.getString("out_trade_no");//商户平台订单号
-        String transactionId = jsonObject.getString("transaction_id");//微信支付交易号
+        String outTradeNo = jsonObject.getString("out_trade_no"); //商户平台订单号
+        String transactionId = jsonObject.getString("transaction_id"); //微信支付交易号
 
         log.info("商户平台订单号：{}", outTradeNo);
         log.info("微信支付交易号：{}", transactionId);
