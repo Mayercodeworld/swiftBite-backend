@@ -31,6 +31,8 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     private DishMapper dishMapper;
     @Autowired
     private SetmealMapper setmealMapper;
+    @Autowired
+    private WorkspaceService workspaceService;
 
     /**
      * 根据时间段统计营业数据

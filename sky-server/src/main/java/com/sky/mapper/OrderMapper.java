@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
-
+    /* 客户端 */
     /**
      * 用户下单
      */
@@ -23,10 +23,9 @@ public interface OrderMapper {
 
     /**
      * 根据订单号查询订单
-     * @param orderNumber
      */
-    @Select("select * from orders where number = #{orderNumber}")
-    Orders getByNumber(String orderNumber);
+    @Select("select * from orders where number = #{outTradeNo} and user_id = #{currentId}")
+    Orders getByNumberAndUserId(String outTradeNo, Long currentId);
 
     /**
      * 修改订单信息
@@ -67,6 +66,14 @@ public interface OrderMapper {
      * @param ids
      */
     void updateStatus(@Param("ids")List<Integer> ids, @Param("order")Orders order);
+
+
+    /**
+     * 根据状态统计订单数量
+     * @param status
+     */
+    @Select("select count(id) from orders where status = #{status}")
+    Integer countStatus(Integer status);
 
     /**
      * 根据动态条件统计营业额数据
