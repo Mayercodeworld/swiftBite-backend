@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -15,15 +17,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class
-ReportServiceImpl implements ReportService {
+public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private OrderMapper orderMapper;
@@ -174,6 +173,41 @@ ReportServiceImpl implements ReportService {
                 .totalOrderCount(totalOrderCount)
                 .validOrderCount(validOrderCount)
                 .validOrderCountList(StringUtils.join(validOrderCountList, ","))
+                .build();
+    }
+
+    /**
+     * 销量排名top10统计
+     * @param begin
+     * @param end
+     * @return
+     */
+    @Override
+    public SalesTop10ReportVO getSalesTop10Statistics(LocalDate begin, LocalDate end) {
+        // 查询每一天销量top10排名
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        Map map = new HashMap();
+        map.put("begin", beginTime);
+        map.put("end", endTime);
+        map.put("status", Orders.COMPLETED);
+
+        List<GoodsSalesDTO> salesTop10List = orderMapper.getSalesTop10ByMap(map);
+        List<String> nameList = salesTop10List.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numberList = salesTop10List.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+
+        /*
+        // 需要重新new出对象，较为复杂，可以使用上面的stream流来处理集合元素
+        List nameList = new ArrayList();
+        List numberList = new ArrayList();
+        salesTop10List.forEach(data -> {
+            nameList.add(data.getName());
+            numberList.add(data.getNumber());
+        });*/
+        return SalesTop10ReportVO.builder()
+                .nameList(StringUtils.join(nameList, ","))
+                .numberList(StringUtils.join(numberList, ","))
                 .build();
     }
 

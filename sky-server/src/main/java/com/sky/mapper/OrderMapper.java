@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderTimeoutVO;
@@ -80,4 +81,9 @@ public interface OrderMapper {
      * @return
      */
     Integer countByMap(Map map);
+
+    /**
+     *  销量排名top10统计
+     */
+    List<GoodsSalesDTO> getSalesTop10ByMap(Map map);
 }
