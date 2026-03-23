@@ -1,3 +1,6 @@
+###
+application-dev.yml
+
 **/target/
 .idea
 *.iml

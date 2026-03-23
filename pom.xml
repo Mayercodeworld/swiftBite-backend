@@ -6,25 +6,25 @@
     <parent>
         <artifactId>spring-boot-starter-parent</artifactId>
         <groupId>org.springframework.boot</groupId>
-        <version>2.7.3</version>
+        <version>3.5.8</version>
+        <relativePath/> <!-- 直接从Maven仓库查找父pom -->
     </parent>
-    <groupId>com.sky</groupId>
-    <artifactId>sky-take-out</artifactId>
-    <packaging>pom</packaging>
+    <groupId>com.swiftbite</groupId>
+    <artifactId>swiftbite-backend</artifactId>
+    <packaging>pom</packaging> <!-- 指明封装pom -->
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>sky-common</module>
-        <module>sky-pojo</module>
-        <module>sky-server</module>
+        <module>swiftbite-common</module>
+        <module>swiftbite-pojo</module>
+        <module>swiftbite-server</module>
     </modules>
     <properties>
-        <mybatis.spring>2.2.0</mybatis.spring>
+        <mybatis.spring>3.0.5</mybatis.spring>
         <lombok>1.18.42</lombok>
         <fastjson>1.2.76</fastjson>
         <commons.lang>2.6</commons.lang>
-        <druid>1.2.1</druid>
-        <pagehelper>1.3.0</pagehelper>
-        <aliyun.sdk.oss>3.10.2</aliyun.sdk.oss>
+        <druid>1.2.23</druid>
+        <pagehelper>2.1.0</pagehelper>
         <knife4j>3.0.2</knife4j>
         <aspectj>1.9.4</aspectj>
         <jjwt>0.9.1</jjwt>
@@ -32,6 +32,7 @@
         <poi>3.16</poi>
         <minio.version>8.6.0</minio.version>
         <okhttp.version>4.12.0</okhttp.version>
+        <mysql.version>8.0.30</mysql.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -96,12 +97,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.aliyun.oss</groupId>
-                <artifactId>aliyun-sdk-oss</artifactId>
-                <version>${aliyun.sdk.oss}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>${jaxb-api}</version>
@@ -119,11 +114,12 @@
                 <version>${poi}</version>
             </dependency>
             <!--微信支付-->
-            <dependency>
+            <!--<dependency>
                 <groupId>com.github.wechatpay-apiv3</groupId>
                 <artifactId>wechatpay-apache-httpclient</artifactId>
                 <version>0.4.8</version>
-            </dependency>
+            </dependency>-->
+
             <!--minio对象存储依赖-->
             <!-- MinIO SDK -->
             <dependency>
@@ -144,6 +140,17 @@
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
             </dependency>
+
+             <!-- MySQL 驱动 -->
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+
+
+
         </dependencies>
     </dependencyManagement>
 </project>

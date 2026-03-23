@@ -1,0 +1,81 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: ${swiftbite.datasource.driver-class-name}
+    url: jdbc:mysql://${swiftbite.datasource.host}:${swiftbite.datasource.port}/${swiftbite.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${swiftbite.datasource.username}
+    password: ${swiftbite.datasource.password}
+  data:
+    redis:
+      host: ${swiftbite.redis.host}
+      port: ${swiftbite.redis.port}
+      password: ${swiftbite.redis.password}
+      database: ${swiftbite.redis.database}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+    java8:
+      time:
+        format: yyyy-MM-dd HH:mm:ss
+  reactor:
+    debug-agent:
+      enabled:  true
+
+mybatis:
+  #mapper 配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.swiftbite.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      swiftbite:
+        mapper: debug
+        service: info
+        controller: info
+
+swiftbite:
+  jwt:
+    # 设置 jwt 签名加密时使用的秘钥
+    admin-secret-key: itcast
+    # 设置 jwt 过期时间
+    admin-ttl: 720000000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+    # 设置用户端的 jwt
+    user-secret-key: itheima
+    user-ttl: 720000000
+    user-token-name: authentication
+
+  # Qdrant 向量存储
+  qdrant:
+    host: ${swiftbite.qdrant.host}
+    port: ${swiftbite.qdrant.port}
+    collectionName: ${swiftbite.qdrant.collectionName}
+
+langchain4j:
+
+  community:
+    dashscope:
+      embedding-model:
+        model-name: text-embedding-v3
+        api-key: ${DASH_SCOPE_API_KEY}
+        dimension: 1024
+      streaming-chat-model:
+        model-name: qwen3-max-2026-01-23
+        api-key: ${DASH_SCOPE_API_KEY}
+#      chat-model:
+#        model-name: qwen-plus
+#        api-key: ${DASH_SCOPE_API_KEY}
